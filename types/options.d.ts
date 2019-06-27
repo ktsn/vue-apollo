@@ -17,16 +17,26 @@ type Omit<T, K extends keyof T> = { [P in Diff<keyof T, K>]?: T[P] };
 
 type ApolloVueThisType<V> = V & { [key: string]: any };
 type VariableFn<V> = ((this: ApolloVueThisType<V>) => Object) | Object;
-type ApolloVueUpdateQueryFn<V> = (this: ApolloVueThisType<V>, previousQueryResult: { [key: string]: any }, options: {
-  error: any,
-  subscriptionData: { data: any; };
-  variables?: { [key: string]: any; };
-}) => Object;
 
-interface ApolloVueSubscribeToMoreOptions<V> {
+export type ApolloVueUpdateQueryFn<
+  V,
+  QueryResult,
+  QueryVariables,
+  SubscriptionData
+> = (
+  this: ApolloVueThisType<V>,
+  previousQueryResult: QueryResult,
+  options: {
+    error: any,
+    subscriptionData: { data: SubscriptionData; };
+    variables?: QueryVariables;
+  }
+) => QueryResult;
+
+interface ApolloVueSubscribeToMoreOptions<V, QueryResult> {
   document: DocumentNode;
   variables?: VariableFn<V>;
-  updateQuery?: ApolloVueUpdateQueryFn<V>;
+  updateQuery?: ApolloVueUpdateQueryFn<V, QueryResult, Record<string, any>, any>;
   onError?: (error: Error) => void;
 }
 
@@ -43,7 +53,7 @@ interface ExtendableVueApolloQueryOptions<V, R> extends _WatchQueryOptions {
   watchLoading?: WatchLoading<V>;
   skip?: ((this: ApolloVueThisType<V>) => boolean) | boolean;
   manual?: boolean;
-  subscribeToMore?: ApolloVueSubscribeToMoreOptions<V> | ApolloVueSubscribeToMoreOptions<V>[];
+  subscribeToMore?: ApolloVueSubscribeToMoreOptions<V, R> | ApolloVueSubscribeToMoreOptions<V, R>[];
   prefetch?: ((context: any) => any) | boolean;
   deep?: boolean;
 }

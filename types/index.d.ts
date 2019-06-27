@@ -4,3 +4,4 @@ import { ApolloProvider } from './apollo-provider'
 
 export default VueApollo
 export { ApolloProvider }
+export * from './components'
